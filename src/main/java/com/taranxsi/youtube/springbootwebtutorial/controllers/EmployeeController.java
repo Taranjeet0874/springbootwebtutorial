@@ -41,12 +41,6 @@ public class EmployeeController {
 
     }
 
-//    @GetMapping
-//    public String getAllEmployees(@RequestParam(required = false) Integer age) {
-//        return "Hello World";
-//
-//    }
-
     @PostMapping
     public ResponseEntity<EmployeeDTO> createNewEmployee(@RequestBody EmployeeDTO inputEmployee) {
         EmployeeDTO savedEmployee = employeeService.createNewEmployee(inputEmployee);
