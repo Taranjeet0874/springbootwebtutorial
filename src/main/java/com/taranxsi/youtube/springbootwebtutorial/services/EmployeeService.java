@@ -3,10 +3,15 @@ package com.taranxsi.youtube.springbootwebtutorial.services;
 import com.taranxsi.youtube.springbootwebtutorial.dto.EmployeeDTO;
 import com.taranxsi.youtube.springbootwebtutorial.entities.EmployeeEntity;
 import com.taranxsi.youtube.springbootwebtutorial.repositories.EmployeeRespository;
+import org.apache.el.util.ReflectionUtil;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,9 +25,8 @@ public class EmployeeService {
         this.modelMapper = modelMapper;
     }
 
-    public EmployeeDTO getEmployeeById(Long id) {
-        EmployeeEntity employeeEntity = employeeRespository.findById(id).orElse(null);
-        return modelMapper.map(employeeEntity, EmployeeDTO.class);
+    public Optional<EmployeeDTO> getEmployeeById(Long id) {
+        return employeeRespository.findById(id).map(employeeEntity -> modelMapper.map(employeeEntity, EmployeeDTO.class));
     }
 
     public List<EmployeeDTO> getAllEmployees() {
@@ -44,5 +48,29 @@ public class EmployeeService {
         employeeEntity.setId(employeeID);
         EmployeeEntity savedEmployeeEntity = employeeRespository.save(employeeEntity);
         return modelMapper.map(savedEmployeeEntity, EmployeeDTO.class);
+    }
+
+    public boolean deleteEmployeeById(Long employeeId) {
+        boolean exists = employeeRespository.existsById(employeeId);
+        if(!exists) {
+            return false;
+        }
+        employeeRespository.deleteById(employeeId);
+        return true;
+    }
+
+    public EmployeeDTO updatePartialEmployeebyID(Long employeeId, Map<String, Object> updates) {
+        boolean exists = employeeRespository.existsById(employeeId);
+        if(!exists) {
+            return null;
+        }
+        EmployeeEntity employeeEntity = employeeRespository.findById(employeeId).orElse(null);
+        updates.forEach((field, value) -> {
+            Field fieldToBeUpdated = ReflectionUtils.getRequiredField(EmployeeEntity.class, field);
+            fieldToBeUpdated.setAccessible(true);
+            ReflectionUtils.setField(fieldToBeUpdated, employeeEntity, value);
+        });
+        employeeRespository.save(employeeEntity);
+        return modelMapper.map(employeeEntity, EmployeeDTO.class);
     }
 }
