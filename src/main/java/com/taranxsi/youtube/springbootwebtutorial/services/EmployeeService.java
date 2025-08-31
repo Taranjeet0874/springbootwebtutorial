@@ -2,6 +2,7 @@ package com.taranxsi.youtube.springbootwebtutorial.services;
 
 import com.taranxsi.youtube.springbootwebtutorial.dto.EmployeeDTO;
 import com.taranxsi.youtube.springbootwebtutorial.entities.EmployeeEntity;
+import com.taranxsi.youtube.springbootwebtutorial.exceptions.ResourceNotFoundException;
 import com.taranxsi.youtube.springbootwebtutorial.repositories.EmployeeRespository;
 import org.apache.el.util.ReflectionUtil;
 import org.modelmapper.ModelMapper;
@@ -44,6 +45,7 @@ public class EmployeeService {
     }
 
     public EmployeeDTO updateEmployeebyID(Long employeeID, EmployeeDTO employeeDTO) {
+        isExistEmployeeById(employeeID);
         EmployeeEntity employeeEntity = modelMapper.map(employeeDTO, EmployeeEntity.class);
         employeeEntity.setId(employeeID);
         EmployeeEntity savedEmployeeEntity = employeeRespository.save(employeeEntity);
@@ -51,19 +53,21 @@ public class EmployeeService {
     }
 
     public boolean deleteEmployeeById(Long employeeId) {
-        boolean exists = employeeRespository.existsById(employeeId);
-        if(!exists) {
-            return false;
-        }
+        isExistEmployeeById(employeeId);
         employeeRespository.deleteById(employeeId);
         return true;
     }
 
-    public EmployeeDTO updatePartialEmployeebyID(Long employeeId, Map<String, Object> updates) {
+    public boolean isExistEmployeeById(Long employeeId) {
         boolean exists = employeeRespository.existsById(employeeId);
         if(!exists) {
-            return null;
+            throw new ResourceNotFoundException("Employee with id " + employeeId + " not found");
         }
+        return true;
+    }
+
+    public EmployeeDTO updatePartialEmployeebyID(Long employeeId, Map<String, Object> updates) {
+        isExistEmployeeById(employeeId);
         EmployeeEntity employeeEntity = employeeRespository.findById(employeeId).orElse(null);
         updates.forEach((field, value) -> {
             Field fieldToBeUpdated = ReflectionUtils.getRequiredField(EmployeeEntity.class, field);

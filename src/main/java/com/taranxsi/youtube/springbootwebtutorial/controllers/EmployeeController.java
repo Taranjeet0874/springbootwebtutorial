@@ -3,6 +3,7 @@ package com.taranxsi.youtube.springbootwebtutorial.controllers;
 
 import com.taranxsi.youtube.springbootwebtutorial.dto.EmployeeDTO;
 import com.taranxsi.youtube.springbootwebtutorial.entities.EmployeeEntity;
+import com.taranxsi.youtube.springbootwebtutorial.exceptions.ResourceNotFoundException;
 import com.taranxsi.youtube.springbootwebtutorial.repositories.EmployeeRespository;
 import com.taranxsi.youtube.springbootwebtutorial.services.EmployeeService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -33,7 +35,7 @@ public class EmployeeController {
         Optional<EmployeeDTO> employeeDTO = employeeService.getEmployeeById(id);
         return employeeDTO
                 .map(employeeDTO1 -> ResponseEntity.ok(employeeDTO1))
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id: " + id));
     }
 
     @GetMapping

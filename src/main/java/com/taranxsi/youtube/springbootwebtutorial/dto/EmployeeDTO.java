@@ -16,7 +16,7 @@ public class EmployeeDTO {
     private Long id;
 
     @NotBlank(message = "Name of the employee cannot be empty")
-    @Size(min = 3, max = 10, message = "Number of characters should be in the range 3-10")
+    @Size(min = 3, max = 30, message = "Number of characters should be in the range 3-10")
     private String name;
 
     @Email(message = "Email should be a valid Email")
@@ -25,7 +25,7 @@ public class EmployeeDTO {
 
     @Max(value = 80, message = "Age cannot be more than 80")
     @Min(value = 18, message = "Age cannot be less than 18")
-    @NotBlank(message = "Age cannot be blank")
+    @NotNull(message = "Age cannot be blank")
     private Integer age;
 
     //@Pattern(regexp ="^(ADMIN|USER)$", message = "The role can be one of ADMIN/USER only")
