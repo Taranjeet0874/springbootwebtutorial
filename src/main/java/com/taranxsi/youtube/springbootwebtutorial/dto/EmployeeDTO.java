@@ -28,7 +28,7 @@ public class EmployeeDTO {
     @NotBlank(message = "Age cannot be blank")
     private Integer age;
 
-    //@Pattern(regexp ="^(ADMIN|USER)$", message = "The role can be one of ADMIN/USER")
+    //@Pattern(regexp ="^(ADMIN|USER)$", message = "The role can be one of ADMIN/USER only")
     @EmployeeRoleValidation
     @NotBlank(message = "Role cannot be blank")
     private String role;
